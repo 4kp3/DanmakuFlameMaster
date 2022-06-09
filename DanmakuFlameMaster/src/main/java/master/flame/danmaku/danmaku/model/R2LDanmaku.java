@@ -62,7 +62,7 @@ public class R2LDanmaku extends BaseDanmaku {
     protected float getAccurateLeft(IDisplayer displayer, long currTime) {
         long elapsedTime = currTime - getActualTime();
         if (elapsedTime >= duration.value) {
-            return -paintWidth;
+            return -size.getWidth();
         }
 
         return displayer.getWidth() - elapsedTime * mStepX;
@@ -78,8 +78,8 @@ public class R2LDanmaku extends BaseDanmaku {
         }
         RECT[0] = left;
         RECT[1] = y;
-        RECT[2] = left + paintWidth;
-        RECT[3] = y + paintHeight;
+        RECT[2] = left + size.getWidth();
+        RECT[3] = y + size.getHeight();
         return RECT;
     }
 
@@ -95,12 +95,12 @@ public class R2LDanmaku extends BaseDanmaku {
 
     @Override
     public float getRight() {
-        return x + paintWidth;
+        return x + size.getWidth();
     }
 
     @Override
     public float getBottom() {
-        return y + paintHeight;
+        return y + size.getHeight();
     }
 
     @Override
@@ -111,7 +111,7 @@ public class R2LDanmaku extends BaseDanmaku {
     @Override
     public void measure(IDisplayer displayer, boolean fromWorkerThread) {
         super.measure(displayer, fromWorkerThread);
-        mDistance = (int) (displayer.getWidth() + paintWidth);
+        mDistance = (int) (displayer.getWidth() + size.getWidth());
         mStepX = mDistance / (float) duration.value;
     }
 

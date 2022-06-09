@@ -477,14 +477,14 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
 
     private int saveCanvas(BaseDanmaku danmaku, Canvas canvas, float left, float top) {
         camera.save();
-        if (locationZ !=0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+        if (locationZ != 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
             camera.setLocation(0, 0, locationZ);
         }
         camera.rotateY(-danmaku.rotationY);
         camera.rotateZ(-danmaku.rotationZ);
         camera.getMatrix(matrix);
         matrix.preTranslate(-left, -top);
-        matrix.postTranslate(left , top);
+        matrix.postTranslate(left, top);
         camera.restore();
         int count = canvas.save();
         canvas.concat(matrix);
@@ -524,18 +524,23 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
 
     private void calcPaintWH(BaseDanmaku danmaku, TextPaint paint, boolean fromWorkerThread) {
         sStuffer.measure(danmaku, paint, fromWorkerThread);
-        setDanmakuPaintWidthAndHeight(danmaku, danmaku.paintWidth, danmaku.paintHeight);
+        setDanmakuPaintSize(danmaku);
     }
 
-    private void setDanmakuPaintWidthAndHeight(BaseDanmaku danmaku, float w, float h) {
-        float pw = w + 2 * danmaku.padding;
-        float ph = h + 2 * danmaku.padding;
+    private void setDanmakuPaintSize(BaseDanmaku danmaku) {
+        //设置尺寸
+        //边框
         if (danmaku.borderColor != 0) {
-            pw += 2 * mDisplayConfig.BORDER_WIDTH;
-            ph += 2 * mDisplayConfig.BORDER_WIDTH;
+            danmaku.size.setBorderWidth(DisplayerConfig.BORDER_WIDTH);
+        } else {
+            danmaku.size.setBorderWidth(0);
         }
-        danmaku.paintWidth = pw + getStrokeWidth();
-        danmaku.paintHeight = ph;
+        //描边
+        danmaku.size.setStrokeWidth(getStrokeWidth());
+
+        //兼容
+        danmaku.paintWidth = danmaku.size.getWidth();
+        danmaku.paintHeight = danmaku.size.getHeight();
     }
 
     @Override

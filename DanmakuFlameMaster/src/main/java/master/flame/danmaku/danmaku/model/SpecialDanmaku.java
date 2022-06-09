@@ -233,8 +233,8 @@ public class SpecialDanmaku extends BaseDanmaku {
 
         currStateValues[0] = currX;
         currStateValues[1] = currY;
-        currStateValues[2] = currX + paintWidth;
-        currStateValues[3] = currY + paintHeight;
+        currStateValues[2] = currX + size.getWidth();
+        currStateValues[3] = currY + size.getHeight();
 
         this.setVisibility(!isOutside());
 

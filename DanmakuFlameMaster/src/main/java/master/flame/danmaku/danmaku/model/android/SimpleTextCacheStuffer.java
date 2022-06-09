@@ -9,6 +9,7 @@ import java.util.Map;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.SpecialDanmaku;
+import master.flame.danmaku.danmaku.model.padding.DanmuSize;
 
 /**
  * Created by ch on 15-7-16.
@@ -52,6 +53,8 @@ public class SimpleTextCacheStuffer extends BaseCacheStuffer {
             danmaku.paintWidth = w;
             danmaku.paintHeight = danmaku.lines.length * textHeight;
         }
+        danmaku.size.setTextWidth(w);
+        danmaku.size.setTextHeight(textHeight);
     }
 
     protected void drawStroke(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, Paint paint) {
@@ -86,12 +89,11 @@ public class SimpleTextCacheStuffer extends BaseCacheStuffer {
     public void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top, boolean fromWorkerThread, AndroidDisplayer.DisplayerConfig displayerConfig) {
         float _left = left;
         float _top = top;
-        left += danmaku.padding;
-        top += danmaku.padding;
-        if (danmaku.borderColor != 0) {
-            left += displayerConfig.BORDER_WIDTH;
-            top += displayerConfig.BORDER_WIDTH;
-        }
+        DanmuSize size = danmaku.size;
+        //计算文字起始坐标
+        //todo 确认是否对边框border的动态改变有影响
+        left += size.getTextPaddingStart();
+        top += size.getTextPaddingTop();
 
         displayerConfig.definePaintParams(fromWorkerThread);
         TextPaint paint = displayerConfig.getPaint(danmaku, fromWorkerThread);
@@ -112,7 +114,7 @@ public class SimpleTextCacheStuffer extends BaseCacheStuffer {
                 displayerConfig.applyPaintConfig(danmaku, paint, false);
                 drawText(danmaku, lines[0], canvas, left, top - paint.ascent(), paint, fromWorkerThread);
             } else {
-                float textHeight = (danmaku.paintHeight - 2 * danmaku.padding) / lines.length;
+                float singleTextHeight = size.getTextHeight() / lines.length;
                 for (int t = 0; t < lines.length; t++) {
                     if (lines[t] == null || lines[t].length() == 0) {
                         continue;
@@ -120,7 +122,7 @@ public class SimpleTextCacheStuffer extends BaseCacheStuffer {
                     if (displayerConfig.hasStroke(danmaku)) {
                         displayerConfig.applyPaintConfig(danmaku, paint, true);
                         float strokeLeft = left;
-                        float strokeTop = t * textHeight + top - paint.ascent();
+                        float strokeTop = t * singleTextHeight + top - paint.ascent();
                         if (displayerConfig.HAS_PROJECTION) {
                             strokeLeft += displayerConfig.sProjectionOffsetX;
                             strokeTop += displayerConfig.sProjectionOffsetY;
@@ -128,7 +130,7 @@ public class SimpleTextCacheStuffer extends BaseCacheStuffer {
                         drawStroke(danmaku, lines[t], canvas, strokeLeft, strokeTop, paint);
                     }
                     displayerConfig.applyPaintConfig(danmaku, paint, false);
-                    drawText(danmaku, lines[t], canvas, left, t * textHeight + top - paint.ascent(), paint, fromWorkerThread);
+                    drawText(danmaku, lines[t], canvas, left, t * singleTextHeight + top - paint.ascent(), paint, fromWorkerThread);
                 }
             }
         } else {
@@ -148,17 +150,18 @@ public class SimpleTextCacheStuffer extends BaseCacheStuffer {
             drawText(danmaku, null, canvas, left, top - paint.ascent(), paint, fromWorkerThread);
         }
 
-        // draw underline
+        // 在文字底部绘制下划线
         if (danmaku.underlineColor != 0) {
             Paint linePaint = displayerConfig.getUnderlinePaint(danmaku);
-            float bottom = _top + danmaku.paintHeight - displayerConfig.UNDERLINE_HEIGHT;
-            canvas.drawLine(_left, bottom, _left + danmaku.paintWidth, bottom, linePaint);
+            float bottom = size.getTextBottom(_top) - displayerConfig.UNDERLINE_HEIGHT;
+            //todo 确认下划线的y坐标是否正确，文本和下划线是否重合
+            canvas.drawLine(left, bottom, left + size.getTextWidth(), bottom, linePaint);
         }
 
-        //draw border
+        // 绘制整个弹幕的边框
         if (danmaku.borderColor != 0) {
             Paint borderPaint = displayerConfig.getBorderPaint(danmaku);
-            canvas.drawRect(_left, _top, _left + danmaku.paintWidth, _top + danmaku.paintHeight,
+            canvas.drawRect(_left, _top, _left + size.getWidth(), _top + size.getHeight(),
                     borderPaint);
         }
 

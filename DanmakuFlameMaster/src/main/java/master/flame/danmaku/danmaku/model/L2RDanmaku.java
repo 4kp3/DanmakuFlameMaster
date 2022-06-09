@@ -52,8 +52,8 @@ public class L2RDanmaku extends R2LDanmaku {
         }
         RECT[0] = left;
         RECT[1] = y;
-        RECT[2] = left + paintWidth;
-        RECT[3] = y + paintHeight;
+        RECT[2] = left + size.getWidth();
+        RECT[3] = y + size.getHeight();
         return RECT;
     }
 
@@ -62,7 +62,7 @@ public class L2RDanmaku extends R2LDanmaku {
         if (elapsedTime >= duration.value) {
             return displayer.getWidth();
         }
-        return mStepX * elapsedTime - paintWidth;
+        return mStepX * elapsedTime - size.getWidth();
     }
 
     @Override
@@ -77,12 +77,12 @@ public class L2RDanmaku extends R2LDanmaku {
 
     @Override
     public float getRight() {
-        return x + paintWidth;
+        return x + size.getWidth();
     }
 
     @Override
     public float getBottom() {
-        return y + paintHeight;
+        return y + size.getHeight();
     }
 
     @Override

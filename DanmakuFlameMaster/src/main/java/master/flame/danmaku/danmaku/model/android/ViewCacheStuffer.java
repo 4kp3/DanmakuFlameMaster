@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.padding.DanmuSize;
 
 public abstract class ViewCacheStuffer<VH extends ViewCacheStuffer.ViewHolder> extends BaseCacheStuffer {
 
@@ -86,6 +87,8 @@ public abstract class ViewCacheStuffer<VH extends ViewCacheStuffer.ViewHolder> e
         viewHolder.layout(0, 0, viewHolder.getMeasureWidth(), viewHolder.getMeasureHeight());
         danmaku.paintWidth = viewHolder.getMeasureWidth();
         danmaku.paintHeight = viewHolder.getMeasureHeight();
+        danmaku.size.setTextWidth(viewHolder.getMeasureWidth());
+        danmaku.size.setTextHeight(viewHolder.getMeasureHeight());
     }
 
     @Override
@@ -111,12 +114,14 @@ public abstract class ViewCacheStuffer<VH extends ViewCacheStuffer.ViewHolder> e
             return;
         }
         //ignore danmaku.padding, apply it onBindViewHolder
+        DanmuSize size = danmaku.size;
         displayerConfig.definePaintParams(fromWorkerThread);
         TextPaint paint = displayerConfig.getPaint(danmaku, fromWorkerThread);
         displayerConfig.applyPaintConfig(danmaku, paint, false);
 
         onBindViewHolder(viewType, viewHolder, danmaku, displayerConfig, paint);
-        viewHolder.measure(View.MeasureSpec.makeMeasureSpec(Math.round(danmaku.paintWidth), View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(Math.round(danmaku.paintHeight), View.MeasureSpec.EXACTLY));
+        viewHolder.measure(View.MeasureSpec.makeMeasureSpec(Math.round(size.getWidth()), View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(Math.round(size.getHeight()), View.MeasureSpec.EXACTLY));
         boolean needRestore = false;
         if (!fromWorkerThread) {
             canvas.save();
@@ -126,17 +131,19 @@ public abstract class ViewCacheStuffer<VH extends ViewCacheStuffer.ViewHolder> e
         // draw underline
         if (danmaku.underlineColor != 0) {
             Paint linePaint = displayerConfig.getUnderlinePaint(danmaku);
-            float bottom = top + danmaku.paintHeight - displayerConfig.UNDERLINE_HEIGHT;
-            canvas.drawLine(left, bottom, left + danmaku.paintWidth, bottom, linePaint);
+            float bottom = danmaku.size.getTextBottom(top) - displayerConfig.UNDERLINE_HEIGHT;
+            float sx = left + size.getTextPaddingStart();
+            float dx = sx + danmaku.size.getTextWidth();
+            canvas.drawLine(sx, bottom, dx, bottom, linePaint);
         }
         //draw border
         if (danmaku.borderColor != 0) {
             Paint borderPaint = displayerConfig.getBorderPaint(danmaku);
-            canvas.drawRect(left, top, left + danmaku.paintWidth, top + danmaku.paintHeight,
+            canvas.drawRect(left, top, left + size.getWidth(), top + size.getHeight(),
                     borderPaint);
         }
         //draw danmaku
-        viewHolder.layout(0, 0, (int) danmaku.paintWidth, (int) danmaku.paintHeight);
+        viewHolder.layout(0, 0, (int) size.getWidth(), (int) size.getHeight());
         viewHolder.draw(canvas, displayerConfig); //FIXME: handle canvas.getMaximumBitmapWidth()
         //TODO: stroke handle displayerConfig
         if (needRestore) {

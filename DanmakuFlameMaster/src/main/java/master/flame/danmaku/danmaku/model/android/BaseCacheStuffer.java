@@ -34,7 +34,8 @@ public abstract class BaseCacheStuffer {
     }
 
     /**
-     * set paintWidth, paintHeight to danmaku
+     * 测量结束后，必须要设置文本的尺寸[DanmuSize.textWidth/DanmuSize.textHeight]
+     * @see master.flame.danmaku.danmaku.model.padding.DanmuSize
      * @param danmaku
      * @param fromWorkerThread
      */

@@ -58,12 +58,13 @@ public class FTDanmaku extends BaseDanmaku {
     }
 
     protected float getLeft(IDisplayer displayer) {
-        if (mLastDispWidth == displayer.getWidth() && mLastPaintWidth == paintWidth) {
+        float w = size.getWidth();
+        if (mLastDispWidth == displayer.getWidth() && mLastPaintWidth == w) {
             return mLastLeft;
         }
-        float left = (displayer.getWidth() - paintWidth) / 2;
+        float left = (displayer.getWidth() - w) / 2;
         mLastDispWidth = displayer.getWidth();
-        mLastPaintWidth = paintWidth;
+        mLastPaintWidth = w;
         mLastLeft = left;
         return left;
     }
@@ -78,8 +79,8 @@ public class FTDanmaku extends BaseDanmaku {
         }
         RECT[0] = left;
         RECT[1] = y;
-        RECT[2] = left + paintWidth;
-        RECT[3] = y + paintHeight;
+        RECT[2] = left + size.getWidth();
+        RECT[3] = y + size.getHeight();
         return RECT;
     }
 
@@ -95,12 +96,12 @@ public class FTDanmaku extends BaseDanmaku {
 
     @Override
     public float getRight() {
-        return x + paintWidth;
+        return x + size.getWidth();
     }
 
     @Override
     public float getBottom() {
-        return y + paintHeight;
+        return y + size.getHeight();
     }
 
     @Override

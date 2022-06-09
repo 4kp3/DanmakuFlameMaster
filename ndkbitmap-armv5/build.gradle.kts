@@ -2,7 +2,7 @@ plugins {
     id("com.android.library")
 }
 
-val SourcePath = "src/main/"
+val sourcePath = "src/main/"
 
 android {
     compileSdk = Versions.COMPILE_SDK
@@ -16,7 +16,7 @@ android {
 
     sourceSets {
         getByName("main") {
-            jniLibs.srcDir("${SourcePath}libs")
+            jniLibs.srcDir("${sourcePath}libs")
         }
     }
 }

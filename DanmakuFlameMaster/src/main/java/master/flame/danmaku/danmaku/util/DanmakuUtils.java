@@ -23,25 +23,27 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.DrawingCache;
 import master.flame.danmaku.danmaku.model.android.DrawingCacheHolder;
+import master.flame.danmaku.danmaku.model.padding.DanmuSize;
 
 public class DanmakuUtils {
 
     /**
      * 检测两个弹幕是否会碰撞
      * 允许不同类型弹幕的碰撞
+     *
      * @param d1
      * @param d2
      * @return
      */
     public static boolean willHitInDuration(IDisplayer disp, BaseDanmaku d1, BaseDanmaku d2,
-            long duration, long currTime) {
+                                            long duration, long currTime) {
         final int type1 = d1.getType();
         final int type2 = d2.getType();
         // allow hit if different type
-        if(type1 != type2)
+        if (type1 != type2)
             return false;
-        
-        if(d1.isOutside()){
+
+        if (d1.isOutside()) {
             return false;
         }
         long dTime = d2.getActualTime() - d1.getActualTime();
@@ -55,45 +57,45 @@ public class DanmakuUtils {
             return true;
         }
 
-        return checkHitAtTime(disp, d1, d2, currTime) 
-                || checkHitAtTime(disp, d1, d2,  d1.getActualTime() + d1.getDuration());
+        return checkHitAtTime(disp, d1, d2, currTime)
+                || checkHitAtTime(disp, d1, d2, d1.getActualTime() + d1.getDuration());
     }
-    
-    private static boolean checkHitAtTime(IDisplayer disp, BaseDanmaku d1, BaseDanmaku d2, long time){
+
+    private static boolean checkHitAtTime(IDisplayer disp, BaseDanmaku d1, BaseDanmaku d2, long time) {
         final float[] rectArr1 = d1.getRectAtTime(disp, time);
         final float[] rectArr2 = d2.getRectAtTime(disp, time);
         if (rectArr1 == null || rectArr2 == null)
             return false;
         return checkHit(d1.getType(), d2.getType(), rectArr1, rectArr2);
     }
-    
+
     private static boolean checkHit(int type1, int type2, float[] rectArr1,
-            float[] rectArr2) {
-        if(type1 != type2)
+                                    float[] rectArr2) {
+        if (type1 != type2)
             return false;
         if (type1 == BaseDanmaku.TYPE_SCROLL_RL) {
             // hit if left2 < right1
             return rectArr2[0] < rectArr1[2];
         }
-        
-        if (type1 == BaseDanmaku.TYPE_SCROLL_LR){
+
+        if (type1 == BaseDanmaku.TYPE_SCROLL_LR) {
             // hit if right2 > left1
             return rectArr2[2] > rectArr1[0];
         }
-        
+
         return false;
     }
 
     public static DrawingCache buildDanmakuDrawingCache(BaseDanmaku danmaku, IDisplayer disp,
-            DrawingCache cache, int bitsPerPixel) {
+                                                        DrawingCache cache, int bitsPerPixel) {
         if (cache == null)
             cache = new DrawingCache();
-
-        cache.build((int) Math.ceil(danmaku.paintWidth), (int) Math.ceil(danmaku.paintHeight), disp.getDensityDpi(), false, bitsPerPixel);
+        DanmuSize size = danmaku.size;
+        cache.build((int) Math.ceil(size.getWidth()), (int) Math.ceil(size.getHeight()), disp.getDensityDpi(), false, bitsPerPixel);
         DrawingCacheHolder holder = cache.get();
         if (holder != null) {
             ((AbsDisplayer) disp).drawDanmaku(danmaku, holder.canvas, 0, 0, true);
-            if(disp.isHardwareAccelerated()) {
+            if (disp.isHardwareAccelerated()) {
                 holder.splitWith(disp.getWidth(), disp.getHeight(), disp.getMaximumCacheWidth(),
                         disp.getMaximumCacheHeight());
             }
@@ -104,9 +106,9 @@ public class DanmakuUtils {
     public static int getCacheSize(int w, int h, int bytesPerPixel) {
         return (w) * (h) * bytesPerPixel;
     }
-    
+
     public final static boolean isDuplicate(BaseDanmaku obj1, BaseDanmaku obj2) {
-        if(obj1 == obj2) {
+        if (obj1 == obj2) {
             return false;
         }
 //        if(obj1.isTimeOut() || obj2.isTimeOut()) {
@@ -126,7 +128,7 @@ public class DanmakuUtils {
     }
 
     public final static int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
-        
+
         if (obj1 == obj2) {
             return 0;
         }
@@ -154,7 +156,8 @@ public class DanmakuUtils {
     }
 
     public final static boolean isOverSize(IDisplayer disp, BaseDanmaku item) {
-        return disp.isHardwareAccelerated() && (item.paintWidth > disp.getMaximumCacheWidth() || item.paintHeight > disp.getMaximumCacheHeight());
+        DanmuSize size = item.size;
+        return disp.isHardwareAccelerated() && (size.getWidth() > disp.getMaximumCacheWidth() || size.getHeight() > disp.getMaximumCacheHeight());
     }
 
     public static void fillText(BaseDanmaku danmaku, CharSequence text) {

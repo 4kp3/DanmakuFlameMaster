@@ -1,3 +1,4 @@
+val kotlin_version: String by extra
 /*
  * Copyright (C) 2013 Chen Hui <calmer91@gmail.com>
  *
@@ -16,6 +17,7 @@
 
 plugins {
     id("com.android.library")
+    kotlin("android")
 }
 
 val SourcePath = "src/main/"
@@ -42,4 +44,7 @@ android {
 //}
 //if (rootProject.file('gradle/gradle-bintray-upload.gradle').exists()) {
 //    apply from: rootProject.file('gradle/gradle-bintray-upload.gradle')
+//}
+//dependencies {
+//    implementation(kotlinModule("stdlib-jdk7", kotlin_version))
 //}

@@ -448,8 +448,7 @@ public class CacheManagingDrawTask extends DrawTask {
                     if (cache == null || cache.get() == null) {
                         return ACTION_CONTINUE;
                     }
-                    if (danmaku.paintWidth == refDanmaku.paintWidth
-                            && danmaku.paintHeight == refDanmaku.paintHeight
+                    if (danmaku.size.equals(refDanmaku.size)
                             && danmaku.underlineColor == refDanmaku.underlineColor
                             && danmaku.borderColor == refDanmaku.borderColor
                             && danmaku.textColor == refDanmaku.textColor
@@ -467,8 +466,8 @@ public class CacheManagingDrawTask extends DrawTask {
                     if (cache.hasReferences()) {
                         return ACTION_CONTINUE;
                     }
-                    float widthGap = cache.width() - refDanmaku.paintWidth;
-                    float heightGap = cache.height() - refDanmaku.paintHeight;
+                    float widthGap = cache.width() - refDanmaku.size.getWidth();
+                    float heightGap = cache.height() - refDanmaku.size.getHeight();
                     if (widthGap >= 0 && widthGap <= finalSlopPixel &&
                             heightGap >= 0 && heightGap <= finalSlopPixel) {
                         mResult = danmaku;
@@ -561,7 +560,7 @@ public class CacheManagingDrawTask extends DrawTask {
                         if (cacheitem != null) {
                             IDrawingCache<?> cache = cacheitem.getDrawingCache();
                             boolean requestRemeasure = 0 != (cacheitem.requestFlags & BaseDanmaku.FLAG_REQUEST_REMEASURE);
-                            if (!requestRemeasure && cache != null && cache.get() !=null && !cache.hasReferences()) {
+                            if (!requestRemeasure && cache != null && cache.get() != null && !cache.hasReferences()) {
                                 cache = DanmakuUtils.buildDanmakuDrawingCache(cacheitem, mDisp, (DrawingCache) cacheitem.cache, mContext.cachingPolicy.bitsPerPixelOfCache);
                                 cacheitem.cache = cache;
                                 push(cacheitem, 0, true);
@@ -766,6 +765,7 @@ public class CacheManagingDrawTask extends DrawTask {
                 danmakus.forEach(new IDanmakus.DefaultConsumer<BaseDanmaku>() {
                     int orderInScreen = 0;
                     int currScreenIndex = 0;
+
                     @Override
                     public int accept(BaseDanmaku item) {
                         if (mPause || mCancelFlag) {
@@ -902,7 +902,7 @@ public class CacheManagingDrawTask extends DrawTask {
                     }
 
                     // guess cache size
-                    int cacheSize = DanmakuUtils.getCacheSize((int) item.paintWidth, (int) item.paintHeight, mContext.cachingPolicy.bitsPerPixelOfCache / 8);
+                    int cacheSize = DanmakuUtils.getCacheSize((int) item.size.getWidth(), (int) item.size.getHeight(), mContext.cachingPolicy.bitsPerPixelOfCache / 8);
                     if (cacheSize * 2 > mMaxCacheSize) {  // block large-size cache
 //                        Log.d("cache", "cache is too large:"+cacheSize);
                         return RESULT_FAILED;

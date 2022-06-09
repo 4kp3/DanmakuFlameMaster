@@ -18,6 +18,8 @@ package master.flame.danmaku.danmaku.model;
 
 import android.util.SparseArray;
 
+import master.flame.danmaku.danmaku.model.padding.DanmuSize;
+
 public abstract class BaseDanmaku {
 
     public final static String DANMAKU_BR_CHAR = "/n";
@@ -109,23 +111,31 @@ public abstract class BaseDanmaku {
     public int borderColor = 0;
 
     /**
-     * 内边距(像素)
-     */
-    public int padding = 0;
-
-    /**
      * 弹幕优先级,0为低优先级,>0为高优先级不会被过滤器过滤
      */
     public byte priority = 0;
 
     /**
-     * 占位宽度
+     * 弹幕尺寸信息
      */
+    public final DanmuSize size = new DanmuSize(0);
+
+    /**
+     * 占位宽度
+     * 此宽度为混合值，包含了文本、边框等数据总和，无法精确控制，所以废弃
+     *
+     * @see master.flame.danmaku.danmaku.model.padding.DanmuSize
+     */
+    @Deprecated
     public float paintWidth = -1;
 
     /**
      * 占位高度
+     * 此高度为混合值，包含了文本、边框等数据总和，无法精确控制，所以废弃
+     *
+     * @see master.flame.danmaku.danmaku.model.padding.DanmuSize
      */
+    @Deprecated
     public float paintHeight = -1;
 
     /**
@@ -231,8 +241,7 @@ public abstract class BaseDanmaku {
     }
 
     public boolean isMeasured() {
-        return paintWidth > -1 && paintHeight > -1
-                && measureResetFlag == flags.MEASURE_RESET_FLAG;
+        return size.isValid() && measureResetFlag == flags.MEASURE_RESET_FLAG;
     }
 
     public void measure(IDisplayer displayer, boolean fromWorkerThread) {
