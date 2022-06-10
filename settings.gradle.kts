@@ -40,5 +40,7 @@ dependencyResolutionManagement {
 rootProject.name = "DanmakuFlameMaster"
 
 include(
-    ":DanmakuFlameMaster", ":Sample", ":ndkbitmap-armv5", ":ndkbitmap-armv7a", ":ndkbitmap-x86"
+    ":DanmakuFlameMaster",
+    //":Sample",
+    ":ndkbitmap-armv5", ":ndkbitmap-armv7a", ":ndkbitmap-x86"
 )
