@@ -1,0 +1,55 @@
+
+plugins {
+    id("com.android.library")
+    id("kotlin-android")
+    //kotlin("android")
+    id("maven-publish")
+}
+
+def sourcePath = "src/main/"
+
+android {
+
+    namespace = Maven.GROUP
+
+    compileSdk = Versions.COMPILE_SDK
+    //使用默认
+    //buildToolsVersion = "30.0.2"
+
+    defaultConfig {
+        minSdk = Versions.MIN_SDK
+        targetSdk = Versions.TARGET_SDK
+    }
+
+    sourceSets {
+        main{
+            jniLibs.srcDirs = ["${sourcePath}libs"]
+        }
+    }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = Maven.GROUP
+                artifactId = Maven.ARTIFACT_ID
+                version = Maven.VERSION_NAME
+            }
+        }
+    }
+}
+
+//if (rootProject.file('gradle/gradle-mvn-push.gradle').exists()) {
+//    apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+//}
+//if (rootProject.file('gradle/gradle-bintray-upload.gradle').exists()) {
+//    apply from: rootProject.file('gradle/gradle-bintray-upload.gradle')
+//}
